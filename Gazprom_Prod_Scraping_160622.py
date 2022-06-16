@@ -18,32 +18,24 @@ def get_html_page(site_link='https://reestr-neftegaz.ru/', url='https://reestr-n
     }
     res_get = re.get(url, headers=HEADERS)
     soup = bs(res_get.text, 'html.parser')
-    pprint(soup)
+    # pprint(soup)
     return soup, url, site_link
 
 def get_companies():
     soup, url, site_link = get_html_page()
     count_companies = 0
-    companies = soup.find_all(class_='')
+    companies = soup.find(class_='b-content__wrapper').find_all(class_='b-block-top__name')
+    # pprint(companies)
     companies_list = []
-    print('*' * 150, 'Данные по компаниям: ')
+    print('*' * 100, 'Данные по компаниям: ')
     for company in companies:
         count_companies += 1
-        date_publ = article.find(class_="tm-article-snippet__datetime-published").find('time').attrs['title']
-        title = article.find(class_="tm-article-snippet__title tm-article-snippet__title_h2").text
-        article_link = article.find(class_="tm-article-snippet__title-link").attrs['href']
-        hub = article.find(class_="tm-article-snippet__hubs").text
-        try:
-            article_text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-2").text
-        except AttributeError:
-            article_text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-1").text
-        clean_article_text = article_text.replace('\n\n', '').replace('\r\n', ''). replace('\n', '').replace('\xa0', '')
-        print(f'Статья №{count_companies}: Дата/время: {date_publ} -- Заголовок: {title} -- Ссылка: {site_link}'
-                  f'{article_link} -- Текст статьи: {clean_article_text} -- Хабы: {hub}')
-        companies_list.append([count_companies, date_publ, title, site_link + article_link, clean_article_text, hub])
+        name_company = company.text.strip()
+        print(count_companies, name_company)
+        companies_list.append([count_companies, name_company])
+    print('*' * 100, 'Список компаний: ')
+    pprint(companies_list)
     return companies_list
-
-
 
 
 
