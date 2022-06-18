@@ -1,7 +1,9 @@
+from fileinput import filename
 import math
 import requests as re
 from bs4 import BeautifulSoup as bs
 from pprint import pprint
+import datetime
 
 
 
@@ -35,15 +37,23 @@ def get_gazprom_suppliers(site_link='https://reestr-neftegaz.ru/', url='https://
             count_companies += 1
             name_company = company.text.strip()
             print(count_companies, name_company)
-            companies_list.append([count_companies, name_company])
+            companies_list.append([name_company])
 
     print('*' * 100, 'Список компаний: ')
     pprint(companies_list)
     print('Количество компаний:', len(companies_list))
     return companies_list
 
+def suppliers_file(filename='gazprom_suppliers_file.txt'):
+    with open(filename, 'w', encoding='utf-8') as file:
+        suppliers = get_gazprom_suppliers()
+        file.write(f'Всего {len(suppliers)} компаний.' + '\n')
+        for supplier in suppliers:
+            file.write((str(supplier)).replace('[', '').replace(']', '') + '\n')
+    print(f"The file {filename} was created! {datetime.datetime.now()}")
+    return suppliers
 
-def get_url(production='установка конденсаторная укм 58-0,4-200-12,5 у3', add_words='купить'):
+def get_suppliers_url(production='установка конденсаторная укм 58-0,4-200-12,5 у3', add_words='купить'):
     req_text = production + ' ' + add_words
     url_req_text  = req_text.replace(' ', '+').replace(',', '%2C')
     url = f'https://yandex.ru/search/?text={url_req_text}&lr=6&src=suggest_Pers'
@@ -66,5 +76,6 @@ def get_url(production='установка конденсаторная укм 5
         pprint(link_item)
 
 if __name__ == '__main__':
-    get_gazprom_suppliers()
-    # get_url()
+    # get_gazprom_suppliers()
+    suppliers_file()
+    # get_suppliers_url()
