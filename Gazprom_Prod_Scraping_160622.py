@@ -83,11 +83,11 @@ def main_form():
     button_2 = Button(text="Записать список поставщиков 'Газпрома' в файл", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=suppliers_file_run)
     button_3 = Button(text="Проверка на вхождение в список 'Газпрома'", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=supplier_verification_run)
     button_4 = Button(text="Закрыть форму", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=exit)
-    button_1.grid(row=3, column=1, padx=10, pady=20)
-    button_2.grid(row=4, column=1, padx=10, pady=20)
-    button_3.grid(row=5, column=1, padx=10, pady=20)
+    button_1.grid(row=3, column=1, padx=30, pady=20, sticky='nesw')
+    button_2.grid(row=4, column=1, padx=30, pady=20, sticky='nesw')
+    button_3.grid(row=5, column=1, padx=30, pady=20, sticky='nesw')
     button_4.grid(row=10, column=1, padx=10, pady=20, sticky="e")
-    speaker_text(text=text_2)
+    speaker_text(text_2 + text_1)
 
     window.mainloop()
 
