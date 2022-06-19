@@ -5,7 +5,6 @@ from pprint import pprint
 import datetime
 from tkinter import *
 from tkinter import messagebox
-import PySimpleGUI as sg
 import time
 from tkinter import simpledialog
 
@@ -17,17 +16,31 @@ def main_form():
     input_label_ID = Label(text="Нажмите на кнопку исходя из того, что вы намерены сделать!", fg='white', bg='black')
     input_label_ID.grid(row=1, column=1, padx=5, pady=10, sticky="w")
 
+
     def get_gazprom_suppliers_run():
-        get_gazprom_suppliers()
+        messagebox.showinfo('Начинается создание списка!', 'Закройте это окно и подождите некоторое время!')
+        sup_list = get_gazprom_suppliers()
+        messagebox.showinfo('Список поставщиков "Газпрома"', 'Получен!')
         window.quit()
+        wind = Tk()
+        text = Text(wind)
+        for sup in sup_list:
+            text.insert(INSERT, f'{sup}\n')
+            text.pack()
+        wind.mainloop()
+        wind.quit()
 
     def suppliers_file_run():
-        suppliers_file()
+        messagebox.showinfo('Начинается копирование данных в файл!', 'Закройте это окно и подождите некоторое время!')
+        suppliers_file(filename='gazprom_suppliers_file.txt')
+        messagebox.showinfo(f'Список поставщиков "Газпрома"', 'Успешно записан в файл {filename}.')
         window.quit()
 
     def supplier_verification_run():
+        messagebox.showinfo('Начинается создание списка поставщиков "Газпрома"!', 'Закройте это окно и подождите некоторое время!')
         supplier_verification()
         window.quit()
+
     
     button_1 = Button(text="Получить список поставщиков 'Газпрома'", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=get_gazprom_suppliers_run)
     button_2 = Button(text="Записать список поставщиков 'Газпрома' в файл", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=suppliers_file_run)
@@ -36,7 +49,7 @@ def main_form():
     button_1.grid(row=3, column=1, padx=10, pady=20)
     button_2.grid(row=4, column=1, padx=10, pady=20)
     button_3.grid(row=5, column=1, padx=10, pady=20)
-    button_4.grid(row=7, column=1, padx=10, pady=20, sticky="e")
+    button_4.grid(row=10, column=1, padx=10, pady=20, sticky="e")
 
             
     window.mainloop()
@@ -54,12 +67,11 @@ def get_gazprom_suppliers(site_link='https://reestr-neftegaz.ru/', url='https://
             'sec-fetch-site': 'cross-site',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.115 Safari/537.36'
         }
-        messagebox.showinfo('Начинается создание списка!', 'Закройте это окно и подождите некоторое время!')
         res_get = requests.get(url, headers=HEADERS)
         soup = bs(res_get.text, 'html.parser')
         count_comp = int(soup.find(class_="b-content__wrapper").find(class_="btn-more").attrs['data-total'])
         count_pages = math.ceil(count_comp / 100)
-        
+
         companies_list = []
         count_companies = 0
         # print('*' * 100, 'Данные по компаниям: ')
@@ -73,38 +85,45 @@ def get_gazprom_suppliers(site_link='https://reestr-neftegaz.ru/', url='https://
                 name_company = company.text.strip()
                 # print(count_companies, name_company)
                 companies_list.append([name_company])
-        messagebox.showinfo('Список поставщиков "Газпрома"', 'Получен!')
         # print('*' * 100, 'Список компаний: ')
         # pprint(companies_list)
         # print('Количество компаний:', len(companies_list))
         return companies_list
 
 def suppliers_file(filename='gazprom_suppliers_file.txt'):
-    messagebox.showinfo('Начинается копирование данных в файл!', 'Закройте это окно и подождите некоторое время!')
+    suppliers = get_gazprom_suppliers()
     with open(filename, 'w', encoding='utf-8') as file:
-        suppliers = get_gazprom_suppliers()
         file.write(f'Всего {len(suppliers)} компаний.' + '\n')
         for supplier in suppliers:
             file.write((str(supplier)).replace('[', '').replace(']', '') + '\n')
-    messagebox.showinfo(f'Список поставщиков "Газпрома"', 'Успешно записан в файл {filename}.')
     # print(f"The file {filename} was created! {datetime.datetime.now()}")
     return suppliers
 
 def supplier_verification():
     suppliers_list = get_gazprom_suppliers()
+    verif_result_list = [[], []]
     while True:
         sdft = simpledialog.askstring('Ввод названия компании', 'Введите название поставщика, которого нужно проверить в списке поставщиков "Газпрома: "')
         if sdft.isdigit():
             messagebox.showinfo('Ошибка!', 'Вы ввели цифры, попробуйте снова!')
-        elif sdft.isalpha():
+        else:
             messagebox.showinfo('Проверка!', f'Вы ввели {sdft} сейчас проверим!')
             for supplier in suppliers_list:
-                if sdft == supplier:
-                    messagebox.showinfo('Результат проверки!', f'Поставщик {sdft} есть в списке поставщиков "Газпрома"!')
-                elif sdft in supplier:
-                    messagebox.showinfo('Результат проверки!', f'Ваш Поставщик: {sdft}. А в списке поставщиков "Газпрома" есть похожая компания {supplier}.')
+                if sdft.lower() == str(supplier).strip().replace('[', '').replace(']', '').lower():
+                    verif_result_list[0].append(supplier)
+                elif sdft.lower() in str(supplier).strip().replace('[', '').replace(']', '').lower():
+                    verif_result_list[1].append(supplier)
             break
-    return sdft
+    if verif_result_list[0] != []:
+        messagebox.showinfo('Результат проверки!', f'Поставщик {sdft} есть в списке поставщиков "Газпрома"!')
+    elif verif_result_list[0] == [] and verif_result_list[1] != []:
+        messagebox.showinfo('Результат проверки!',
+                        f'Ваш Поставщик: {sdft}. А в списке поставщиков "Газпрома" есть: {verif_result_list[1]}.')
+    elif verif_result_list == [[], []]:
+        messagebox.showinfo('Результат проверки!', f'Поставщика {sdft} нет в списке поставщиков "Газпрома"!')
+    # pprint(suppliers_list)
+    # pprint(verif_result_list)
+    return verif_result_list
 
 
 def get_suppliers_url(production='установка конденсаторная укм 58-0,4-200-12,5 у3', add_words='купить'):
