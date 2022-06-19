@@ -21,10 +21,12 @@ def main_form():
     window["bg"] = "black"
     window.title("Python - choice user form.")
     text_1 = "Нажмите кнопку!"
-    text_2 = "Привет! Я Алла Пугачёва. Что будем делать?"
+    text_2 = "Привет! Я Алла. Cестра Алисы и Маруси. Что будем делать?"
     input_label_ID = Label(text=text_1, fg='white', bg='black')
     input_label_ID.grid(row=1, column=1, padx=5, pady=10, sticky="w")
 
+    def exit_form():
+        window.quit()
 
     def get_gazprom_suppliers_run():
         text_3 = 'Начинается создание списка!'
@@ -82,7 +84,7 @@ def main_form():
     button_1 = Button(text="Получить список поставщиков 'Газпрома'", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=get_gazprom_suppliers_run)
     button_2 = Button(text="Записать список поставщиков 'Газпрома' в файл", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=suppliers_file_run)
     button_3 = Button(text="Проверка на вхождение в список 'Газпрома'", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=supplier_verification_run)
-    button_4 = Button(text="Закрыть форму", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=exit)
+    button_4 = Button(text="Закрыть форму", activebackground='red', highlightcolor='red', bg='blue', fg='white', command=exit_form)
     button_1.grid(row=3, column=1, padx=30, pady=20, sticky='nesw')
     button_2.grid(row=4, column=1, padx=30, pady=20, sticky='nesw')
     button_3.grid(row=5, column=1, padx=30, pady=20, sticky='nesw')
